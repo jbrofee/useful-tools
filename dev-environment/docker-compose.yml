@@ -1,0 +1,33 @@
+services:
+  dev-environment:
+    build:
+        context: .
+        dockerfile: Dockerfile
+        args:
+          GITHUB_TOKEN: ${GITHUB_TOKEN}
+          NVIM_CONFIG: ${NVIM_CONFIG}
+    container_name: dev-container
+    # Allows my 1Password agent to be used for SSH authentication
+    environment:
+      - SSH_AUTH_SOCK=/ssh-agent
+      - GITHUB_REPO=${GITHUB_REPO}
+    volumes:
+      - ./workspace:/workspace
+      # Also part of 1Password integration
+      - ~/.1password/agent.sock:/ssh-agent
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+
+    # This command makes the ssh folder within the container,
+    # scans GitHub for its SSH key, and clones the repository if it exists.
+    # The final bash command keeps the container running.
+    command: >
+      -c "
+        if [ -n \"$$GITHUB_REPO\" ] && [ ! -d \".git\" ]; then
+          mkdir -p ~/.ssh &&
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null &&
+          git clone $$GITHUB_REPO . 
+        fi &&
+        exec bash
+      "
