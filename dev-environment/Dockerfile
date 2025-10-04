@@ -31,7 +31,7 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | b
 
 # If a Github token and nvim config repo are present, clones nvim config to image
 RUN if [ -n "$NVIM_CONFIG" ] && [ -n "$GITHUB_TOKEN" ]; then \
-        git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/jbrofee/${NVIM_CONFIG}.git" /root/.config/nvim; \
+    git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${NVIM_CONFIG}.git" /root/.config/nvim; \
     fi
 
 # The folder that is used when you access the container
